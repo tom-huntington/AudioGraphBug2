@@ -26,10 +26,7 @@ int main()
 			uint32_t value_size{};
 			winrt::check_hresult(reference.as<IMemoryBufferByteAccess>()->GetBuffer(&value, &value_size));
 
-			if (value_size == 0)
-				return;
 			auto num_samples = value_size / sizeof(float);
-
 			samples.fetch_add((int)num_samples);
 			//timer1.time();
 		}
@@ -72,7 +69,8 @@ std::pair<AudioGraph, AudioFrameOutputNode> Initialize(bool add_frame_output_nod
 	{
 		using namespace winrt::Windows::Devices::Enumeration;
 		auto renderDevices = DeviceInformation::FindAllAsync(DeviceClass::AudioRender).get();
-		auto renderer = renderDevices.GetAt(1);
+		_ASSERT(renderDevices.Size() > 0);
+		auto renderer = renderDevices.GetAt(std::rand()%renderDevices.Size());
 		std::wcout << renderer.Name().c_str() << std::endl;
 		settings.PrimaryRenderDevice(renderer);
 	}
